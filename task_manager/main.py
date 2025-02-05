@@ -7,18 +7,25 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.openapi.utils import get_openapi
+from dotenv import load_dotenv
+import os
+
 from .database import SessionLocal, init_db
 from .crud import create_task, get_tasks, update_task_status, delete_task
 from .auth import get_current_user, authenticate_user, create_access_token, oauth2_scheme
 from .schemas import User, Token, TaskCreate
 from .models import Task  # 確保 Task 正確導入
 
+# ✅ 加載環境變數
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY", "your_default_secret_key")  # 避免硬編碼
+
 # 初始化資料庫
 init_db()
 
 def seed_data(db: Session):
-    """插入測試數據"""
-    if db.query(Task).count() == 0:
+    """插入測試數據（僅在開發環境執行）"""
+    if os.getenv("ENV") == "development" and db.query(Task).count() == 0:
         task = Task(
             user_id=1,
             title="Test Task",
@@ -35,10 +42,9 @@ def seed_data(db: Session):
 with SessionLocal() as db:
     seed_data(db)
 
-# 定義 FastAPI 應用
 app = FastAPI(default_response_class=JSONResponse)
 
-# 自定義 OpenAPI 配置
+# ✅ 保護 API，不讓 SECRET_KEY、DB_URL 直接暴露
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -79,11 +85,11 @@ def read_tasks(status: str = None, current_user: User = Depends(get_current_user
 
 @app.post("/tasks/")
 def create_new_task(
-    task: TaskCreate,  # ✅ 使用 Pydantic Model 來接受 Request Body
+    task: TaskCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if task.due_date is not None:  # ✅ 確保不對 None 進行日期轉換
+    if task.due_date:
         try:
             task.due_date = datetime.strptime(task.due_date, "%Y-%m-%d")
         except ValueError:
@@ -98,23 +104,6 @@ def create_new_task(
         priority=task.priority
     )
     return {"message": "任務新增成功", "task": new_task}
-
-@app.put("/tasks/{task_id}")
-def update_task(task_id: int, completed: bool, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    task = update_task_status(db, task_id=task_id, user_id=current_user.id, completed=completed)
-    if not task:
-        raise HTTPException(status_code=404, detail="找不到任務或無權限修改")
-    return {"message": "任務更新成功", "task": task}
-
-@app.delete("/tasks/{task_id}")
-def delete_task_by_id(task_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """ 刪除指定 ID 的任務 """
-    deleted_task = delete_task(db, task_id=task_id, user_id=current_user.id)  # ✅ 正確使用 delete_task
-    
-    if not deleted_task:
-        raise HTTPException(status_code=404, detail="找不到任務或無權限刪除")
-    
-    return {"message": "任務刪除成功"}
 
 @app.post("/token", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
