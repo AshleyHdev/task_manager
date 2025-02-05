@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任務列表</title>
+</head>
+<body>
+    <h1>任務列表</h1>
+    <ul id="task-list"></ul>
+    <script>
+        async function fetchTasks() {
+            const response = await fetch('/tasks/');
+            const tasks = await response.json();
+            const taskList = document.getElementById('task-list');
+            tasks.forEach(task => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${task.title} - 優先順序: ${task.priority}`;
+                taskList.appendChild(listItem);
+            });
+        }
+        fetchTasks();
+    </script>
+</body>
+</html>
