@@ -3,28 +3,35 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+from dotenv import load_dotenv
+import os
 from .schemas import User
 
-# 定義 OAuth2PasswordBearer
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+# ✅ 載入 .env 環境變數
+load_dotenv()
 
-# 加密密碼的上下文
+# ✅ 從 .env 讀取 SECRET_KEY 和 設定
+SECRET_KEY = os.getenv("SECRET_KEY", "default_fallback_key")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+
+# ✅ 讀取 .env 內的用戶資訊
+USER_USERNAME = os.getenv("USER_USERNAME", "default_user")
+USER_EMAIL = os.getenv("USER_EMAIL", "hidden@example.com")
+USER_PASSWORD_HASH = os.getenv("USER_PASSWORD_HASH", "")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# 模擬用戶數據庫
+# ✅ 模擬用戶數據庫（改為讀取 .env）
 fake_users_db = {
-    "帳號": {
-        "id": 1,  # 用戶 ID
-        "username": "帳號",
-        "email": "帳號@example.com",
-        "hashed_password": pwd_context.hash("密碼"),  # ✅ 初始化時生成一次，存入數據庫
+    USER_USERNAME: {
+        "id": 1,
+        "username": USER_USERNAME,
+        "email": USER_EMAIL,
+        "hashed_password": USER_PASSWORD_HASH
     }
 }
-
-# JWT 設定
-SECRET_KEY = "a_strong_random_secret_key_for_your_app"  # ✅ 更改為隨機且安全的密鑰
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """驗證使用者密碼"""
@@ -41,7 +48,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     """生成 JWT Token"""
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    to_encode.update({"exp": expire, "sub": data["sub"]})  # 確保 sub 正確寫入
+    to_encode.update({"exp": expire, "sub": data["sub"]})  # ✅ 確保 sub 正確寫入
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -67,5 +74,5 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     if user is None:
         raise credentials_exception
 
-    # 返回包含完整用戶信息的對象
+    # ✅ 返回包含完整用戶信息的對象
     return User(id=user["id"], username=user["username"], email=user["email"])

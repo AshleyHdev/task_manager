@@ -7,8 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.openapi.utils import get_openapi
-from dotenv import load_dotenv
-import os
+from dotenv import load_dotenv  # ✅ 加入 dotenv
+import os  # ✅ 用來讀取環境變數
 
 from .database import SessionLocal, init_db
 from .crud import create_task, get_tasks, update_task_status, delete_task
@@ -16,9 +16,11 @@ from .auth import get_current_user, authenticate_user, create_access_token, oaut
 from .schemas import User, Token, TaskCreate
 from .models import Task  # 確保 Task 正確導入
 
-# ✅ 加載環境變數
+# ✅ 載入 .env 檔案
 load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY", "your_default_secret_key")  # 避免硬編碼
+
+# ✅ 使用環境變數來讀取 SECRET_KEY，避免硬編碼
+SECRET_KEY = os.getenv("SECRET_KEY", "your_secure_secret_key")  # 🔒 預設值用較安全的密鑰
 
 # 初始化資料庫
 init_db()
