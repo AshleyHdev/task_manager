@@ -25,13 +25,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ✅ 模擬用戶數據庫（改為讀取 .env）
 fake_users_db = {
-    USER_USERNAME: {
+    os.getenv("FAKE_USERNAME", "default_user"): {
         "id": 1,
-        "username": USER_USERNAME,
-        "email": USER_EMAIL,
-        "hashed_password": USER_PASSWORD_HASH
+        "username": os.getenv("FAKE_USERNAME", "default_user"),
+        "email": os.getenv("FAKE_EMAIL", "hidden@example.com"),
+        "hashed_password": pwd_context.hash(os.getenv("FAKE_PASSWORD", "default_password")),
     }
 }
+print(f"🔑 Hashed Password: {fake_users_db[os.getenv('FAKE_USERNAME')]['hashed_password']}")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """驗證使用者密碼"""

@@ -120,3 +120,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @app.get("/tasks/protected")
 def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": f"Hello, {current_user.username}!"}
+
+@app.on_event("startup")
+def check_env_variables():
+    print("🔍 FAKE_USERNAME:", os.getenv("FAKE_USERNAME"))
+    print("🔍 FAKE_EMAIL:", os.getenv("FAKE_EMAIL"))
+    print("🔍 FAKE_PASSWORD:", os.getenv("FAKE_PASSWORD"))
