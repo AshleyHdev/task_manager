@@ -1,22 +1,20 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 
+# 設定 SQLite 資料庫位置
 SQLALCHEMY_DATABASE_URL = "sqlite:///./tasks.db"
+
+# 建立資料庫引擎
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 
+# 設定 Session 連線
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# 建立基礎類別
 Base = declarative_base()
 
-class Task(Base):
-    __tablename__ = "tasks"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, nullable=True)
-    completed = Column(Boolean, default=False)
-    due_date = Column(DateTime, nullable=True, default=None)
-    priority = Column(String, default="中")
-
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    """初始化資料庫，只需運行一次"""
+    from .models import User, Task  # ✅ 確保 models.py 內的模型已經載入
+    Base.metadata.create_all(bind=engine)  # 建立表格
