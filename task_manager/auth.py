@@ -13,11 +13,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # 模擬用戶數據庫
 fake_users_db = {
-    "AshleyH.dev": {
+    "帳號": {
         "id": 1,  # 用戶 ID
-        "username": "AshleyH.dev",
-        "email": "ashleyh.dev@example.com",
-        "hashed_password": pwd_context.hash("ji394907"),  # ✅ 初始化時生成一次，存入數據庫
+        "username": "帳號",
+        "email": "帳號@example.com",
+        "hashed_password": pwd_context.hash("密碼"),  # ✅ 初始化時生成一次，存入數據庫
     }
 }
 
