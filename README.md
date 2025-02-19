@@ -1,141 +1,125 @@
-Task Manager API - FastAPI 任務管理系統
+📝 Task Manager API 🚀
 
-這是一個基於 FastAPI 的任務管理 API，實現了 CRUD（Create、Read、Update、Delete） 功能，並支援 OAuth2 JWT 身份驗證，確保只有授權用戶可以存取任務數據。
+這是一個基於 **FastAPI** 的任務管理系統，提供使用者認證、JWT 授權、任務 CRUD 操作，適用於任何需要 **管理待辦事項** 的應用場景。
 
-📌 目錄
- • 🌟 主要功能
- • 🚀 環境需求
- • 🔧 安裝與設定
- • 🖥️ 啟動專案
- • 🔑 身份驗證
- • 📌 API 端點
- • 🛠️ 主要技術
- • 📄 目錄結構
- • 📢 貢獻指南
- • 📜 授權
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109.2-009688?logo=fastapi&style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
+![SQLite](https://img.shields.io/badge/SQLite-3.35.5-003B57?logo=sqlite)
+![JWT](https://img.shields.io/badge/JWT-Authorization-yellow)
 
-🌟 主要功能
+---
 
-✅ 使用 FastAPI 提供 RESTful API
-✅ 支援 JWT 身份驗證（OAuth2 + JWT Token）
-✅ 內建 SQLite 資料庫（可改為 PostgreSQL / MySQL）
-✅ 完整的 CRUD 操作：
- • 新增任務
- • 查詢任務
- • 更新任務狀態
- • 刪除任務
-✅ Swagger UI（API Docs）：可視化測試 API
-✅ pydantic 數據驗證，確保請求數據有效
-✅ 異步處理，提升效能
+## **📌 功能特色**
+✅ **使用者註冊 & 登入**  
+✅ **JWT Token 身分驗證**  
+✅ **任務 CRUD (創建、讀取、更新、刪除)**  
+✅ **Swagger 自動 API 文件**  
+✅ **支援 SQLite 儲存數據**  
+✅ **支援 CORS (允許跨來源請求)**  
 
-🚀 環境需求
+---
 
-請確保你的系統已安裝以下環境：
- • Python 3.10+
- • pip 22.0+
- • Git
- • SQLite（或其他 SQL 資料庫）
+## **📖 API 文件**
+啟動伺服器後，您可以訪問 API 文件：
+📌 **Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
+📌 **ReDoc:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)  
 
-🔧 安裝與設定
+---
 
-1️⃣ 克隆專案
-
+## **💡 安裝與使用**
+### **1️⃣ 安裝環境**
+確保您已經安裝 **Python 3.10**，然後執行：
+```bash
 git clone https://github.com/AshleyHdev/task_manager.git
 cd task_manager
-
-2️⃣ 建立虛擬環境
-
-python3 -m venv venv
-source venv/bin/activate  # Mac/Linux
-venv\Scripts\activate      # Windows
-
-3️⃣ 安裝相依套件
-
+python -m venv myenv
+source myenv/bin/activate  # Windows: myenv\Scripts\activate
 pip install -r requirements.txt
 
-🖥️ 啟動專案
+2️⃣ 設定環境變數
 
-1️⃣ 初始化資料庫
+在 .env 檔案中設定：
 
-rm tasks.db  # 刪除舊資料庫（如存在）
-python3 -c "from task_manager.database import init_db; init_db()"
+SECRET_KEY="your_secret_key"
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-2️⃣ 啟動 FastAPI 伺服器
+3️⃣ 初始化資料庫
+
+alembic upgrade head
+
+4️⃣ 啟動伺服器
 
 uvicorn task_manager.main:app --reload
 
-啟動後，你可以透過以下方式訪問 API：
- • API 端點測試（Swagger UI）：
-👉 http://127.0.0.1:8000/docs
- • 查看 OpenAPI JSON：
-👉 http://127.0.0.1:8000/openapi.json
+伺服器啟動後，您可以訪問 http://127.0.0.1:8000/ 🎉
 
-🔑 身份驗證
+🛠 技術細節
+ • FastAPI - 提供高效能 API 框架
+ • SQLite - 簡單且輕量級的資料庫
+ • JWT (JSON Web Token) - 提供使用者身份驗證
+ • Pydantic - 確保數據驗證安全
+ • Alembic - 資料庫遷移工具
+ • CORS Middleware - 允許前端跨來源請求
 
-本專案使用 OAuth2 + JWT 進行身份驗證，步驟如下：
+🔑 API 認證
 
-1️⃣ 獲取 Access Token
+本 API 使用 OAuth2 + JWT Token，請先透過 /auth/token 取得 access_token，再將其附加於 API 請求標頭。
 
-使用 POST /token 取得 JWT Token：
+取得 Token
 
-curl -X 'POST' 'http://127.0.0.1:8000/token' \
--H 'accept: application/json' \
--H 'Content-Type: application/x-www-form-urlencoded' \
--d 'grant_type=password&username=您的帳號&password=*******&scope=&client_id=&client_secret='
+curl -X POST "http://127.0.0.1:8000/auth/token" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "username=你的帳號&password=你的密碼"
 
-🔹 返回結果
+成功回傳：
 
 {
-  "access_token": "your_jwt_token_here",
+  "access_token": "your_generated_token",
   "token_type": "bearer"
 }
 
-2️⃣ 在 API 請求中加入 Token
+驗證 Token
 
-當存取受保護的 API 時，請將 Token 加入 Authorization 標頭：
+在 API 測試工具中 加上 Header：
 
-curl -X 'GET' 'http://127.0.0.1:8000/tasks/' \
--H "Authorization: Bearer your_jwt_token_here" \
--H 'accept: application/json'
+Authorization: Bearer your_generated_token
 
-📌 API 端點
+🔧 開發測試
 
-📍 用戶認證
+測試用戶
 
-方法 端點 描述
-POST /token 取得 JWT Token
+帳號 密碼
+test_user 123456
 
-📍 任務管理
+API 測試範例
 
-方法 端點 描述
-GET /tasks/ 查詢所有任務
-POST /tasks/ 新增任務
-PUT /tasks/{task_id}?completed=true 更新任務狀態
-DELETE /tasks/{task_id} 刪除任務
+🔹 創建新任務
 
-📌 詳細 API 文件請參考 http://127.0.0.1:8000/docs
+curl -X POST "http://127.0.0.1:8000/tasks/" \
+     -H "Authorization: Bearer your_generated_token" \
+     -H "Content-Type: application/json" \
+     -d '{
+            "title": "學習 FastAPI",
+            "description": "了解 FastAPI 的基本概念",
+            "due_date": "2025-02-20",
+            "priority": "高"
+        }'
 
-🛠️ 主要技術
+🔹 取得所有任務
 
-技術 用途
-FastAPI 構建 API 服務
-SQLite 內建資料庫（可換成 PostgreSQL）
-SQLAlchemy ORM 操作資料庫
-Pydantic 數據驗證
-JWT (PyJWT) Token 驗證
-Uvicorn 運行 FastAPI 伺服器
+curl -X GET "http://127.0.0.1:8000/tasks/" \
+     -H "Authorization: Bearer your_generated_token"
 
-📄 目錄結構
+💙 貢獻方式
 
-task_manager/
-│── task_manager/
-│   ├── __init__.py
-│   ├── main.py          # 主應用程式
-│   ├── database.py      # 資料庫初始化
-│   ├── models.py        # 資料庫模型
-│   ├── schemas.py       # Pydantic 數據模型
-│   ├── crud.py          # 資料庫操作函數
-│   ├── auth.py          # JWT Token 身份驗證
-│   ├── seed_data        # 測試數據
-│── requirements.txt     # 相依套件
-│── README.md            # 自述文件（本檔案）
+歡迎 Fork & PR：
+ 1. Fork 本專案
+ 2. 創建新分支 (git checkout -b feature-branch)
+ 3. 提交修改 (git commit -m "✨ 新增功能")
+ 4. 推送分支 (git push origin feature-branch)
+ 5. 發送 PR 🚀
+
+📜 版權聲明
+
+本專案遵循 MIT License，自由使用與修改。
+作者：@AshleyH.dev 🎨
