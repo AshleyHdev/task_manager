@@ -42,8 +42,17 @@ pip install -r requirements.txt
 
 SECRET_KEY="your_secret_key"
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+DATABASE_URL="sqlite:///./tasks.db"
 
 3️⃣ 初始化資料庫
+
+如果是 第一次 使用，請先執行：
+
+alembic init alembic  # 只需執行一次
+alembic revision --autogenerate -m "初始化資料庫"
+alembic upgrade head
+
+如果已經初始化過資料庫：
 
 alembic upgrade head
 
@@ -53,13 +62,23 @@ uvicorn task_manager.main:app --reload
 
 伺服器啟動後，您可以訪問 http://127.0.0.1:8000/ 🎉
 
-🛠 技術細節
- • FastAPI - 提供高效能 API 框架
- • SQLite - 簡單且輕量級的資料庫
- • JWT (JSON Web Token) - 提供使用者身份驗證
- • Pydantic - 確保數據驗證安全
- • Alembic - 資料庫遷移工具
- • CORS Middleware - 允許前端跨來源請求
+📁 專案目錄結構
+
+task_manager/
+│── alembic/             # 資料庫遷移工具
+│── task_manager/
+│   ├── main.py          # FastAPI 入口
+│   ├── models.py        # 資料庫模型
+│   ├── schemas.py       # Pydantic 數據驗證
+│   ├── database.py      # 資料庫連線設定
+│   ├── crud.py          # 資料操作函式
+│   ├── routers/
+│   │   ├── auth.py      # 登入 & 註冊 API
+│   │   ├── task.py      # 任務 API
+│   │   ├── user.py      # 使用者 API
+│   ├── .env             # 環境變數 (請自行創建)
+│── requirements.txt     # 依賴套件
+│── README.md            # 本文件
 
 🔑 API 認證
 
@@ -84,14 +103,7 @@ curl -X POST "http://127.0.0.1:8000/auth/token" \
 
 Authorization: Bearer your_generated_token
 
-🔧 開發測試
-
-測試用戶
-
-帳號 密碼
-test_user 123456
-
-API 測試範例
+🔧 API 測試範例
 
 🔹 創建新任務
 
@@ -109,6 +121,38 @@ curl -X POST "http://127.0.0.1:8000/tasks/" \
 
 curl -X GET "http://127.0.0.1:8000/tasks/" \
      -H "Authorization: Bearer your_generated_token"
+
+🔹 查詢單一任務
+
+curl -X GET "http://127.0.0.1:8000/tasks/1" \
+     -H "Authorization: Bearer your_generated_token"
+
+🔹 更新任務
+
+curl -X PUT "http://127.0.0.1:8000/tasks/1" \
+     -H "Authorization: Bearer your_generated_token" \
+     -H "Content-Type: application/json" \
+     -d '{
+            "title": "更新後的任務標題",
+            "completed": true
+        }'
+
+🔹 刪除任務
+
+curl -X DELETE "http://127.0.0.1:8000/tasks/1" \
+     -H "Authorization: Bearer your_generated_token"
+
+🔍 錯誤排除 (Debugging Tips)
+
+1️⃣ 遇到 500 Internal Server Error
+ • 確保 .env 設定正確，並且有執行 alembic upgrade head
+ • 檢查 task_manager/database.py 是否正確連結到 SQLite
+
+2️⃣ 遇到 401 Unauthorized
+ • 檢查 Authorization Header 是否有正確帶入 Bearer {token}
+
+3️⃣ 遇到 404 Not Found
+ • 確保請求的 task_id 是否存在，使用 GET /tasks/ 先檢查
 
 💙 貢獻方式
 
