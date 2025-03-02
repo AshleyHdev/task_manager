@@ -41,11 +41,11 @@
 
 | 方法 | 端點 | 描述 |
 |------|------|------|
-| POST,/auth/register,使用者註冊
-POST,/auth/token,登入 & 獲取 JWT Token
-GET,/users/me,取得當前使用者資訊
-PUT,/users/update,更新使用者資訊
-DELETE,/users/delete,刪除帳號（不可逆）
+| POST | /auth/register | 使用者註冊 |
+| POST | /auth/token | 登入 & 獲取 JWT Token |
+| GET | /users/me | 取得當前使用者資訊 |
+| PUT | /users/update | 更新使用者資訊 |
+| DELETE | /users/delete | 刪除帳號（不可逆） |
 
 🔍 查詢與篩選
 
