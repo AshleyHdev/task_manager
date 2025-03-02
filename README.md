@@ -51,9 +51,9 @@
 
 | 參數 | 類型 | 描述 |
 |------|------|------|
-| completed,boolean | true 取得已完成任務，false 取得未完成任務
-| priority,string | 篩選 高/中/低 優先級任務
-| due_date,string (YYYY-MM-DD) | 篩選指定截止日期的任務
+| completed | boolean | true 取得已完成任務，false 取得未完成任務
+| priority | string | 篩選 高/中/低 優先級任務
+| due_date | string (YYYY-MM-DD) | 篩選指定截止日期的任務
 
 ---
 
