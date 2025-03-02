@@ -213,9 +213,8 @@ curl -X DELETE "http://127.0.0.1:8000/tasks/1" \
  4. 推送分支 (git push origin feature-branch)
  5. 發送 PR 🚀
 
-📜 版權聲明
-
-本專案遵循 MIT License，自由使用與修改。
+📜 **License**
+本專案遵循 **MIT License**，使用者可以自由使用、修改、散佈此程式碼，但需保留原始授權聲明，詳情請見 [LICENSE](./LICENSE) 檔案。
 作者：@AshleyH.dev 🎨
 
 ---
